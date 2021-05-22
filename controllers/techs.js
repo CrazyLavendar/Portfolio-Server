@@ -53,7 +53,7 @@ exports.readOne = async (req, res) => {
 exports.update = async (req, res) => {
   try {
     console.log(req.body);
-    req.body.slug = slugify(req.body.company);
+    req.body.slug = slugify(req.body.name);
     const updated = await techs.findOneAndUpdate(
       { slug: req.params.slug },
       req.body,
