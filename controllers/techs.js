@@ -1,27 +1,29 @@
 const slugify = require("slugify");
 const techs = require("../models/techs");
 
+
 exports.create = async (req, res) => {
   try {
     console.log(req.body);
     req.body.slug = slugify(req.body.name);
-    //const category = await new Category({ name, slug: slugify(name) }).save();
-    const newTech = await new techs(req.body).save();
-    res.json(newTech);
-  } catch (error) {
-    console.log("Tech create  error", error);
-    res.status(400).send("Create Tech  failed");
+    const newExp = await new techs(req.body).save();
+    res.json(newExp);
+  } catch (err) {
+    console.log(err);
+    // res.status(400).send("Create product failed"); ;
+    res.status(400).json({
+      err: err.message,
+    });
   }
 };
 
-exports.list = async (req, res) => {
+exports.read = async (req, res) => {
   try {
     console.log(req.body);
-    let technologies = await techs
-      .find({})
+    let allTechs = await techs.find({})
       .sort([["createdAt", "desc"]])
       .exec();
-    res.json(technologies);
+    res.json(allTechs);
   } catch (err) {
     console.log(err);
     // res.status(400).send("Create product failed");
@@ -30,35 +32,51 @@ exports.list = async (req, res) => {
     });
   }
 };
-// list all
 
-// exports.read = async (req, res) => {
-//   let sub = await Sub.findOne({ slug: req.params.slug }).exec(); // .slug is same router .put "xxx/:slug"
-//   res.json(sub);
-// };
-// exports.update = async (req, res) => {
-//   const { name, parent } = req.body;
-//   try {
-//     const updated = await Sub.findOneAndUpdate(
-//       {
-//         slug: req.params.slug, // to find
-//       },
-//       { name, parent, slug: slugify(name) }, // to update
-//       {
-//         new: true, //optional
-//       }
-//     );
-//     res.json(updated);
-//   } catch (error) {
-//     console.log(error);
-//     res.status(400).send("Update sub failed");
-//   }
-// };
-// exports.remove = async (req, res) => {
-//   try {
-//     const deleted = await Sub.findOneAndDelete({ slug: req.params.slug });
-//     res.json(deleted);
-//   } catch (error) {
-//     res.status(400).send("delete sub failed");
-//   }
-// };
+exports.readOne = async (req, res) => {
+  try {
+    console.log(req.body);
+    let allTechs = await techs.findOne({
+      slug: req.params.slug,
+    }).exec();
+
+    res.json(allTechs);
+  } catch (err) {
+    console.log(err);
+    // res.status(400).send("Create product failed");
+    res.status(400).json({
+      err: err.message,
+    });
+  }
+};
+
+exports.update = async (req, res) => {
+  try {
+    console.log(req.body);
+    req.body.slug = slugify(req.body.company);
+    const updated = await techs.findOneAndUpdate(
+      { slug: req.params.slug },
+      req.body,
+      { new: true }
+    ).exec();
+    res.json(updated);
+  } catch (err) {
+    console.log(err);
+    // res.status(400).send("Create product failed");
+    res.status(400).json({
+      err: err.message,
+    });
+  }
+};
+
+exports.remove = async (req, res) => {
+  try {
+    const deleted = await techs.findOneAndRemove({
+      slug: req.params.slug,
+    }).exec();
+    res.json(deleted);
+  } catch (err) {
+    console.log(err);
+    return res.staus(400).send("techs delete failed");
+  }
+};
